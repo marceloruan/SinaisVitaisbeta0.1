@@ -20,15 +20,16 @@ public class MainActivity extends AppCompatActivity {
     private static final int ATIVA_BLUETOOTH = 1;
     private static final int SOLICITA_CONEXAO = 2;
 
-    BluetoothAdapter meuBluetoothAdapter= null;
-    BluetoothDevice meuDevie=null;
+    BluetoothAdapter meuBluetoothAdapter= null;//dispositivo adaptador para o hardwere
+
+    BluetoothDevice meuDevie = null;
 
     boolean conexao=false;
 
     private String MAC=null;
     BluetoothSocket meusocket=null;
 
-    UUID MEU_UUID= UUID.fromString("00001101-0000-1000-800010085f9b34fb");
+    UUID MEU_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +59,14 @@ public class MainActivity extends AppCompatActivity {
                     //desconectar
                     try{
                         meusocket.close();
+                        conexao=false;
+                        btnconexao.setText("Conectar");
+                        Toast.makeText(getApplicationContext(), "Bluetooth foi Desconectado", Toast.LENGTH_LONG).show();
+
                     }catch (IOException erro){
 
                     }
+
 
                 }else{
                     //conectar
@@ -92,16 +98,21 @@ public class MainActivity extends AppCompatActivity {
                     MAC=data.getExtras().getString(ListaDispositivo.ENDERECO_MAC);
 
                     //Toast.makeText(getApplicationContext(), "MAC "+MAC, Toast.LENGTH_LONG).show();
-                    meuDevie=meuBluetoothAdapter.getRemoteDevice(MAC);
+
+                    meuDevie = meuBluetoothAdapter.getRemoteDevice(MAC);
 
                     try{
-
-                        meusocket= meuDevie.createRfcommSocketToServiceRecord(MEU_UUID);
+                        meusocket = meuDevie.createRfcommSocketToServiceRecord(MEU_UUID);
 
                         meusocket.connect();
-                        Toast.makeText(getApplicationContext(), "Voce foi conetado como"+ MAC, Toast.LENGTH_LONG).show();
+
+                        conexao=true;
+
+                        btnconexao.setText("Descoectar");
+                        Toast.makeText(getApplicationContext(), "Voce foi conetado com"+ MAC, Toast.LENGTH_LONG).show();
 
                     }catch (IOException erro){
+                        conexao=false;
 
                     }
 
