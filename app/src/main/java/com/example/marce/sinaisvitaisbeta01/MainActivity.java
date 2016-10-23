@@ -1,127 +1,118 @@
 package com.example.marce.sinaisvitaisbeta01;
-
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothServerSocket;
-import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
-    Button btnconexao;
-    private static final int ATIVA_BLUETOOTH = 1;
-    private static final int SOLICITA_CONEXAO = 2;
+public class MainActivity extends Activity {
 
-    BluetoothAdapter meuBluetoothAdapter= null;//dispositivo adaptador para o hardwere
-
-    BluetoothDevice meuDevie = null;
-
-    boolean conexao=false;
-
-    private String MAC=null;
-    BluetoothSocket meusocket=null;
-
-    UUID MEU_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-
+    /* Definição dos objetos que serão usados na Activity Principal
+        statusMessage mostrará mensagens de status sobre a conexão
+        counterMessage mostrará o valor do contador como recebido do Arduino
+        connect é a thread de gerenciamento da conexão Bluetooth
+     */
+    static TextView statusMessage;
+    static TextView counterMessage;
+    ConnectedThread connect;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /* Link entre os elementos da interface gráfica e suas
+            representações em Java.
+         */
+        statusMessage = (TextView) findViewById(R.id.statusMessage);
+        counterMessage = (TextView) findViewById(R.id.counterMessage);
 
-        btnconexao = (Button) findViewById(R.id.btnconexao);
-
-
-        meuBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(meuBluetoothAdapter== null){
-            Toast.makeText(getApplicationContext(), " Seu dispositovo não possui bluetooth", Toast.LENGTH_LONG).show();
-
-         /*verifica se o blutooth esta ativado*/
-
-        }else if (!meuBluetoothAdapter.isEnabled()){
-
-            Intent ativa = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(ativa, ATIVA_BLUETOOTH);
+        /* Teste rápido. O hardware Bluetooth do dispositivo Android
+            está funcionando ou está bugado de forma misteriosa?
+            Será que existe, pelo menos? Provavelmente existe.
+         */
+        BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter == null) {
+            statusMessage.setText("Que pena! Hardware Bluetooth não está funcionando :(");
+        } else {
+            statusMessage.setText("Ótimo! Hardware Bluetooth está funcionando :)");
         }
 
-        btnconexao.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(conexao){
-                    //desconectar
-                    try{
-                        meusocket.close();
-                        conexao=false;
-                        btnconexao.setText("Conectar");
-                        Toast.makeText(getApplicationContext(), "Bluetooth foi Desconectado", Toast.LENGTH_LONG).show();
+        /* A chamada do seguinte método liga o Bluetooth no dispositivo Android
+            sem pedido de autorização do usuário. É altamente não recomendado no
+            Android Developers, mas, para simplificar este app, que é um demo,
+            faremos isso. Na prática, em um app que vai ser usado por outras
+            pessoas, não faça isso.
+         */
+        btAdapter.enable();
 
-                    }catch (IOException erro){
+        /* Definição da thread de conexão como cliente.
+            Aqui, você deve incluir o endereço MAC do seu módulo Bluetooth.
+            O app iniciará e vai automaticamente buscar por esse endereço.
+            Caso não encontre, dirá que houve um erro de conexão.
+         */
+        connect = new ConnectedThread("98:D3:31:90:8C:50");
+        connect.start();
 
-                    }
-
-
-                }else{
-                    //conectar
-                    Intent abreLista= new Intent(MainActivity.this,ListaDispositivo.class);
-                    startActivityForResult(abreLista,SOLICITA_CONEXAO);
-
-                }
-
-            }
-        });
-
+        /* Um descanso rápido, para evitar bugs esquisitos.
+         */
+        try {
+            Thread.sleep(1000);
+        } catch (Exception E) {
+            E.printStackTrace();
+        }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
 
-            case ATIVA_BLUETOOTH:
-                if(resultCode== Activity.RESULT_OK){
-                    Toast.makeText(getApplicationContext(), " Bluthooth foi Ativado", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(getApplicationContext(), "Bluthooth Nao foi Ativado", Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                break;
-            case SOLICITA_CONEXAO:
-                if(resultCode==Activity.RESULT_OK){
-                    MAC=data.getExtras().getString(ListaDispositivo.ENDERECO_MAC);
 
-                    //Toast.makeText(getApplicationContext(), "MAC "+MAC, Toast.LENGTH_LONG).show();
 
-                    meuDevie = meuBluetoothAdapter.getRemoteDevice(MAC);
+    public static Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
 
-                    try{
-                        meusocket = meuDevie.createRfcommSocketToServiceRecord(MEU_UUID);
+            /* Esse método é invocado na Activity principal
+                sempre que a thread de conexão Bluetooth recebe
+                uma mensagem.
+             */
+            Bundle bundle = msg.getData();
+            byte[] data = bundle.getByteArray("data");
+            String dataString= new String(data);
 
-                        meusocket.connect();
+            /* Aqui ocorre a decisão de ação, baseada na string
+                recebida. Caso a string corresponda à uma das
+                mensagens de status de conexão (iniciadas com --),
+                atualizamos o status da conexão conforme o código.
+             */
+            if(dataString.equals("---N"))
+                statusMessage.setText("Ocorreu um erro durante a conexão D:");
+            else if(dataString.equals("---S"))
+                statusMessage.setText("Conectado :D");
+            else {
 
-                        conexao=true;
+                /* Se a mensagem não for um código de status,
+                    então ela deve ser tratada pelo aplicativo
+                    como uma mensagem vinda diretamente do outro
+                    lado da conexão. Nesse caso, simplesmente
+                    atualizamos o valor contido no TextView do
+                    contador.
+                 */
 
-                        btnconexao.setText("Descoectar");
-                        Toast.makeText(getApplicationContext(), "Voce foi conetado com"+ MAC, Toast.LENGTH_LONG).show();
-
-                    }catch (IOException erro){
-                        conexao=false;
-
-                    }
-
-                }else{
-                    Toast.makeText(getApplicationContext(), "Falha do mac", Toast.LENGTH_LONG).show();
-
-                }
-
+                counterMessage.setText(dataString.toString());
+            }
 
         }
+    };
+
+    /* Esse método é invocado sempre que o usuário clicar na TextView
+        que contem o contador. O app Android transmite a string "restart",
+        seguido de uma quebra de linha, que é o indicador de fim de mensagem.
+     */
+    public void restartCounter(View view) {
+        connect.write("restart\n".getBytes());
     }
 }
