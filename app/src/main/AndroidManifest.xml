@@ -26,7 +26,8 @@
             android:name=".ListaDispositivo"
             android:label="Dispositivos Pareados.."
             android:theme="@android:style/Theme.Dialog" />
-        <activity android:name=".Main2Activity"></activity>
+
+
     </application>
 
 </manifest>

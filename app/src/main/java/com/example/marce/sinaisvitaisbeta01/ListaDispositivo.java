@@ -40,7 +40,7 @@ public class ListaDispositivo extends ListActivity{
         Set<BluetoothDevice> dispositivospareados=dispositivo.getBondedDevices();
 
         if(dispositivospareados.size() > 0 ){
-            Toast.makeText(getApplicationContext(), " entrou ", Toast.LENGTH_LONG).show();
+           // Toast.makeText(getApplicationContext(), " entrou ", Toast.LENGTH_LONG).show();
             for(BluetoothDevice tipos : dispositivospareados){
                 String nomebt=tipos.getName();
                 String macbt=tipos.getAddress();
