@@ -35,6 +35,8 @@ public class MainActivity extends Activity {
 
     static TextView statusMessage;
     static TextView counterMessage;
+    static TextView temperatura;
+
     ConnectedThread connect;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,7 @@ public class MainActivity extends Activity {
          */
         statusMessage = (TextView) findViewById(R.id.statusMessage);
         counterMessage = (TextView) findViewById(R.id.counterMessage);
+        temperatura=(TextView) findViewById(R.id.temperatura);
         btnconexao = (Button) findViewById(R.id.btnconectar);
 
 
@@ -194,8 +197,11 @@ public class MainActivity extends Activity {
                     atualizamos o valor contido no TextView do
                     contador.
                  */
+                String valores[];
+                valores=dataString.split(" ");
 
-                counterMessage.setText(dataString.toString());
+                counterMessage.setText(valores[0].toString());
+                temperatura.setText(valores[1].toString());
             }
 
         }

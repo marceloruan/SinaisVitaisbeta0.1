@@ -2,7 +2,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colopreto">
+    android:background="@color/colorbranco">
 
 
     <TextView
@@ -11,22 +11,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/colorbranco"
+        android:textColor="@color/colopreto"
         android:layout_marginTop="31dp"
         android:layout_below="@+id/textView"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="..."
-                android:id="@+id/counterMessage"
-        android:textSize="@dimen/abc_text_size_display_3_material"
-
-        android:textColor="@color/colorred"
-        android:layout_marginTop="12dp"
-        android:layout_below="@+id/textView2"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -34,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textView"
-        android:textColor="@color/colorbranco"
+        android:textColor="@color/colopreto"
         android:layout_alignBaseline="@+id/statusMessage"
         android:layout_alignBottom="@+id/statusMessage"
         android:layout_alignParentLeft="true"
@@ -47,7 +34,7 @@
         android:id="@+id/statusMessage"
         android:layout_weight="0.06"
         android:layout_marginTop="84dp"
-        android:textColor="@color/colorbranco"
+        android:textColor="@color/colopreto"
         android:layout_below="@+id/btnconectar"
         android:layout_toRightOf="@+id/textView"
         android:layout_toEndOf="@+id/textView"
@@ -59,6 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/btnconectar"
+        android:textColor="@color/colorbranco"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
         android:elevation="0dp"
         android:background="@color/colorPrimaryDark"
@@ -66,6 +54,43 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="20dp" />
+
+    <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="..."
+                android:id="@+id/counterMessage"
+        android:textSize="@dimen/abc_text_size_display_3_material"
+
+        android:textColor="@color/colorred"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:text="Temperatura"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3"
+        android:textColor="@color/colopreto"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_below="@+id/counterMessage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="33dp"
+
+        />
+
+    <TextView
+        android:text="..."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="37dp"
+        android:id="@+id/temperatura"
+        android:textColor="@color/colorred"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+        android:layout_below="@+id/textView3"
+        android:layout_alignLeft="@+id/counterMessage"
+        android:layout_alignStart="@+id/counterMessage" />
 
 
 </RelativeLayout>
