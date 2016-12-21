@@ -1,4 +1,3 @@
-
 /*  Pulse Sensor Amped 1.4    by Joel Murphy and Yury Gitman   http://www.pulsesensor.com
 
 ----------------------  Notes ----------------------  ---------------------- 
@@ -25,6 +24,9 @@ int ledpin=12; // led on D13 will show blink on / off
 int BluetoothData; // the data given from Computer
 
 //  Variables
+int LM35 = A1;
+float temperatura;
+int valorlido;
 int pulsePin = A0;                 // Pulse Sensor purple wire connected to analog pin 0
 int blinkPin = 13;                // pin to blink led at each beat
 int fadePin = 5;                  // pin to do fancy classy fading blink at each beat
@@ -43,7 +45,7 @@ static boolean serialVisual = true;   // Set to 'false' by Default.  Re-set to '
 void setup(){
   pinMode(blinkPin,OUTPUT);         // pin that will blink to your heartbeat!
   pinMode(fadePin,OUTPUT);          // pin that will fade to your heartbeat!
-  Serial.begin(115200);             // we agree to talk fast!
+  Serial.begin(9600);             // we agree to talk fast!
  // serial.begin(115200);             // we agree to talk fast!
   interruptSetup();                 // sets up to read Pulse Sensor signal every 2mS 
    // UN-COMMENT THE NEXT LINE IF YOU ARE POWERING The Pulse Sensor AT LOW VOLTAGE, 
@@ -57,7 +59,10 @@ void setup(){
 
 //  Where the Magic Happens
 void loop(){
-  
+  valorlido = analogRead(LM35);
+  temperatura = (0.0048875855*valorlido);
+  temperatura = (temperatura*100);
+   Serial.println(temperatura);
     serialOutput() ;       
     
   if (QS == true){     //  A Heartbeat Was Found
@@ -72,10 +77,11 @@ void loop(){
         // AQUI ELE ESCREVE PRO ARDUINO.... 
         Genotronex.print(String(serialOutputWhenBeatHappens()));
         Genotronex.print(" ");
+         Genotronex.print(temperatura);
         Genotronex.print("\n");  
         Serial.print("   *  ");
   
-        
+       
         QS = false;                      // reset the Quantified Self flag for next time    
        } 
       else { 
@@ -95,14 +101,7 @@ BluetoothData=Genotronex.read();
    //Genotronex.println("LED  On D12 Off ! ");
   }
 }
-  delay(20);                             //  take a break
+  delay(1000);                             //  take a break
 }
-
-
-
-
-
-
-
 
 
