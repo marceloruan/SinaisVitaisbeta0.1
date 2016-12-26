@@ -43,6 +43,7 @@ void setup()
 	
 	lcd.setCursor(0,0);	      
 	lcd.print(" Pulso = ");
+	Serial.begin(9600);
 }
 
 //  Where the Magic Happens
@@ -53,6 +54,10 @@ void loop()
 		lcd.setCursor(9,0);
 		lcd.print(BPM);	//Mostra mensagem
                 lcd.print(" BPM ");
+		Serial.prinln(" BPM");
+	        Serial.prinln(BPM);
+
+
 		QS = false;     // reset the Quantified Self flag for next time    
     }
  
